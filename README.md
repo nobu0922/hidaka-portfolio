@@ -9,8 +9,11 @@ PC・スマホ両対応（レスポンシブ対応）で、軽量かつSEOを意
 - アニメーション・jQueryを用いたインタラクション
 - 納品実績50件以上の経験を反映
 
-## 公開URL
-[ポートフォリオLPを見る](https://nobu0922.github.io/hidaka-portfolio/lp/)
+## 各バージョン
+- **LP版**（ランディングページ）
+  - フォルダ：`/lp`
+  - 公開URL：[LPを見る](https://nobu0922.github.io/hidaka-portfolio/lp/)
+  - 特徴：HTML/SCSS、アニメーション、レスポンシブ対応
 
 ## ライセンス
 本リポジトリはポートフォリオ目的で公開しています。  
