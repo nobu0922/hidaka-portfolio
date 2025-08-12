@@ -38,11 +38,13 @@
       height: 100%;
     }
   }
-  &__drawer.is-hidden {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    transform: translateX(-100%) !important;
+  @include sp {
+    &__drawer.is-hidden {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      transform: translateX(-100%) !important;
+    }
   }
   &__drawer {
     @include sp {

@@ -42,14 +42,13 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// ハンバーガーメニューのトグル処理
+// ハンバーガーメニュー
 document.addEventListener("DOMContentLoaded", () => {
   const drawer = document.querySelector(".header__drawer");
   const hamburger = document.querySelector(".header__hamburger-button");
-  const nav = document.getElementById("global-nav"); // <nav id="global-nav" hidden>
+  const nav = document.getElementById("global-nav");
   if (!drawer || !hamburger || !nav) return;
 
-  // スマホ判定（幅はプロジェクトに合わせて調整）
   const mq = window.matchMedia("(max-width: 767px)");
 
   let savedScrollY = 0;
@@ -106,29 +105,32 @@ document.addEventListener("DOMContentLoaded", () => {
     (lastFocused instanceof HTMLElement ? lastFocused : hamburger).focus();
   };
 
-  const bindEvents = () => {
-    // 初期化（閉じた状態）
-    drawer.classList.add("is-ready");
-    hamburger.setAttribute("aria-expanded", "false");
-    drawer.setAttribute("aria-hidden", "true");
-    nav.hidden = true;
-
+  const bindMobileEvents = () => {
+    // 初期状態は閉じる
+    closeDrawer();
+    hamburger.style.display = ""; // 表示
     hamburger.addEventListener("click", toggleHandler);
     document.addEventListener("click", outsideHandler);
     document.addEventListener("keydown", escHandler);
     nav.addEventListener("click", linkHandler);
   };
 
-  const unbindEvents = () => {
-    // PC時は強制的に開いた状態（CSS任せ）or閉じっぱなしにする
-    closeDrawer();
+  const unbindMobileEvents = () => {
+    // PC時は常時表示
+    hamburger.classList.remove("active");
+    drawer.classList.add("active");
+    hamburger.setAttribute("aria-expanded", "true");
+    drawer.setAttribute("aria-hidden", "false");
+    nav.hidden = false;
+    hamburger.style.display = "none"; // ハンバーガー非表示
+    unlockScroll();
+
     hamburger.removeEventListener("click", toggleHandler);
     document.removeEventListener("click", outsideHandler);
     document.removeEventListener("keydown", escHandler);
     nav.removeEventListener("click", linkHandler);
   };
 
-  // イベントハンドラを外に出す（remove用）
   const toggleHandler = () => {
     const open = hamburger.getAttribute("aria-expanded") === "true";
     open ? closeDrawer() : openDrawer();
@@ -150,10 +152,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // 初回判定
-  mq.matches ? bindEvents() : unbindEvents();
+  mq.matches ? bindMobileEvents() : unbindMobileEvents();
 
-  // 画面幅が変わったら再判定
+  // 幅が変わったら切り替え
   mq.addEventListener("change", (e) => {
-    e.matches ? bindEvents() : unbindEvents();
+    e.matches ? bindMobileEvents() : unbindMobileEvents();
   });
 });
