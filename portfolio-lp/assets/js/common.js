@@ -42,36 +42,28 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// ドロワーメニューのトグル（スクロールロック対応）
+// ドロワーメニューのトグル（スクロールロック & アクセシビリティ対応）
 document.addEventListener("DOMContentLoaded", () => {
   const drawer = document.querySelector(".header__drawer");
   const hamburger = document.querySelector(".header__hamburger-button");
-  if (!drawer || !hamburger) return;
+  const nav = document.getElementById("global-nav"); // <nav id="global-nav" ... hidden>
+  if (!drawer || !hamburger || !nav) return;
 
-  // チラ見え防止：描画後に非表示解除
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      drawer.classList.remove("is-hidden");
-    });
-  });
-
-  // 初期状態
+  // 初期状態（必ず閉じた状態に統一）
   drawer.classList.add("is-ready");
   hamburger.setAttribute("aria-expanded", "false");
+  drawer.setAttribute("aria-hidden", "true");
+  nav.hidden = true;
 
   let savedScrollY = 0;
+  let lastFocused = null;
 
   const lockScroll = () => {
-    // すでにロック中なら何もしない
     if (document.documentElement.classList.contains("is-scroll-locked")) return;
-
     savedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-
-    // スクロールバー幅（レイアウトズレ防止）
     const sbw = window.innerWidth - document.documentElement.clientWidth;
 
     document.documentElement.classList.add("is-scroll-locked");
-    // 本体を固定（iOSでも確実に止める）
     document.body.style.position = "fixed";
     document.body.style.top = `-${savedScrollY}px`;
     document.body.style.left = "0";
@@ -82,9 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const unlockScroll = () => {
     if (!document.documentElement.classList.contains("is-scroll-locked")) return;
-
     document.documentElement.classList.remove("is-scroll-locked");
-    // 固定解除＆元の位置へ復帰
     document.body.style.position = "";
     document.body.style.top = "";
     document.body.style.left = "";
@@ -94,31 +84,67 @@ document.addEventListener("DOMContentLoaded", () => {
     window.scrollTo(0, savedScrollY);
   };
 
+  const focusFirstItem = () => {
+    const first = nav.querySelector("a, button, [tabindex]:not([tabindex='-1'])");
+    first?.focus();
+  };
+
   const openDrawer = () => {
+    lastFocused = document.activeElement;
+
     hamburger.classList.add("active");
     drawer.classList.add("active");
+
     hamburger.setAttribute("aria-expanded", "true");
     drawer.setAttribute("aria-hidden", "false");
+    nav.hidden = false;
+
     lockScroll();
+    // 初回フォーカスをメニューへ
+    focusFirstItem();
   };
 
   const closeDrawer = () => {
     hamburger.classList.remove("active");
     drawer.classList.remove("active");
+
     hamburger.setAttribute("aria-expanded", "false");
     drawer.setAttribute("aria-hidden", "true");
+    nav.hidden = true;
+
     unlockScroll();
+    // フォーカスをトグルに戻す（または直前の要素）
+    (lastFocused instanceof HTMLElement ? lastFocused : hamburger).focus();
   };
 
   // トグル
   hamburger.addEventListener("click", () => {
-    drawer.classList.contains("active") ? closeDrawer() : openDrawer();
+    const open = hamburger.getAttribute("aria-expanded") === "true";
+    open ? closeDrawer() : openDrawer();
   });
 
   // 外側クリックで閉じる
   document.addEventListener("click", (e) => {
-    if (!e.target.closest(".header__drawer") && !e.target.closest(".header__hamburger-button") && drawer.classList.contains("active")) {
+    const isOpen = hamburger.getAttribute("aria-expanded") === "true";
+    if (!isOpen) return;
+    const t = e.target;
+    if (!drawer.contains(t) && !hamburger.contains(t)) {
       closeDrawer();
     }
+  });
+
+  // Escで閉じる
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && hamburger.getAttribute("aria-expanded") === "true") {
+      closeDrawer();
+    }
+  });
+
+  // メニュー内リンクをクリックしたら閉じる（#アンカーでも閉じたい想定）
+  nav.addEventListener("click", (e) => {
+    const a = e.target.closest("a");
+    if (!a) return;
+    // 同ページ内リンクは即閉じる
+    closeDrawer();
   });
 });
