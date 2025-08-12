@@ -42,18 +42,15 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// ドロワーメニューのトグル（スクロールロック & アクセシビリティ対応）
+// ハンバーガーメニューのトグル処理
 document.addEventListener("DOMContentLoaded", () => {
   const drawer = document.querySelector(".header__drawer");
   const hamburger = document.querySelector(".header__hamburger-button");
-  const nav = document.getElementById("global-nav"); // <nav id="global-nav" ... hidden>
+  const nav = document.getElementById("global-nav"); // <nav id="global-nav" hidden>
   if (!drawer || !hamburger || !nav) return;
 
-  // 初期状態（必ず閉じた状態に統一）
-  drawer.classList.add("is-ready");
-  hamburger.setAttribute("aria-expanded", "false");
-  drawer.setAttribute("aria-hidden", "true");
-  nav.hidden = true;
+  // スマホ判定（幅はプロジェクトに合わせて調整）
+  const mq = window.matchMedia("(max-width: 767px)");
 
   let savedScrollY = 0;
   let lastFocused = null;
@@ -62,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.documentElement.classList.contains("is-scroll-locked")) return;
     savedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
     const sbw = window.innerWidth - document.documentElement.clientWidth;
-
     document.documentElement.classList.add("is-scroll-locked");
     document.body.style.position = "fixed";
     document.body.style.top = `-${savedScrollY}px`;
@@ -91,60 +87,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const openDrawer = () => {
     lastFocused = document.activeElement;
-
     hamburger.classList.add("active");
     drawer.classList.add("active");
-
     hamburger.setAttribute("aria-expanded", "true");
     drawer.setAttribute("aria-hidden", "false");
     nav.hidden = false;
-
     lockScroll();
-    // 初回フォーカスをメニューへ
     focusFirstItem();
   };
 
   const closeDrawer = () => {
     hamburger.classList.remove("active");
     drawer.classList.remove("active");
+    hamburger.setAttribute("aria-expanded", "false");
+    drawer.setAttribute("aria-hidden", "true");
+    nav.hidden = true;
+    unlockScroll();
+    (lastFocused instanceof HTMLElement ? lastFocused : hamburger).focus();
+  };
 
+  const bindEvents = () => {
+    // 初期化（閉じた状態）
+    drawer.classList.add("is-ready");
     hamburger.setAttribute("aria-expanded", "false");
     drawer.setAttribute("aria-hidden", "true");
     nav.hidden = true;
 
-    unlockScroll();
-    // フォーカスをトグルに戻す（または直前の要素）
-    (lastFocused instanceof HTMLElement ? lastFocused : hamburger).focus();
+    hamburger.addEventListener("click", toggleHandler);
+    document.addEventListener("click", outsideHandler);
+    document.addEventListener("keydown", escHandler);
+    nav.addEventListener("click", linkHandler);
   };
 
-  // トグル
-  hamburger.addEventListener("click", () => {
+  const unbindEvents = () => {
+    // PC時は強制的に開いた状態（CSS任せ）or閉じっぱなしにする
+    closeDrawer();
+    hamburger.removeEventListener("click", toggleHandler);
+    document.removeEventListener("click", outsideHandler);
+    document.removeEventListener("keydown", escHandler);
+    nav.removeEventListener("click", linkHandler);
+  };
+
+  // イベントハンドラを外に出す（remove用）
+  const toggleHandler = () => {
     const open = hamburger.getAttribute("aria-expanded") === "true";
     open ? closeDrawer() : openDrawer();
-  });
-
-  // 外側クリックで閉じる
-  document.addEventListener("click", (e) => {
-    const isOpen = hamburger.getAttribute("aria-expanded") === "true";
-    if (!isOpen) return;
-    const t = e.target;
-    if (!drawer.contains(t) && !hamburger.contains(t)) {
+  };
+  const outsideHandler = (e) => {
+    if (!hamburger.contains(e.target) && !drawer.contains(e.target) && hamburger.getAttribute("aria-expanded") === "true") {
       closeDrawer();
     }
-  });
-
-  // Escで閉じる
-  document.addEventListener("keydown", (e) => {
+  };
+  const escHandler = (e) => {
     if (e.key === "Escape" && hamburger.getAttribute("aria-expanded") === "true") {
       closeDrawer();
     }
-  });
+  };
+  const linkHandler = (e) => {
+    if (e.target.closest("a")) {
+      closeDrawer();
+    }
+  };
 
-  // メニュー内リンクをクリックしたら閉じる（#アンカーでも閉じたい想定）
-  nav.addEventListener("click", (e) => {
-    const a = e.target.closest("a");
-    if (!a) return;
-    // 同ページ内リンクは即閉じる
-    closeDrawer();
+  // 初回判定
+  mq.matches ? bindEvents() : unbindEvents();
+
+  // 画面幅が変わったら再判定
+  mq.addEventListener("change", (e) => {
+    e.matches ? bindEvents() : unbindEvents();
   });
 });
