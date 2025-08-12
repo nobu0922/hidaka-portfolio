@@ -11,8 +11,8 @@ PC・スマホ両対応（レスポンシブ対応）で、軽量かつSEOを意
 
 ## 各バージョン
 - **LP版**（ランディングページ）
-  - フォルダ：`/lp`
-  - 公開URL：[LPを見る](https://nobu0922.github.io/hidaka-portfolio/lp/)
+  - フォルダ：`/portfolio-lp`
+  - 公開URL：[LPを見る](https://nobu0922.github.io/hidaka-portfolio/portfolio-lp/)
   - 特徴：HTML/SCSS、アニメーション、レスポンシブ対応
 
 ## ライセンス
