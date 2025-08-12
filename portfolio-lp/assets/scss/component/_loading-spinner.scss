@@ -1,0 +1,20 @@
+// ------------------------
+// Utility（変数・関数・mixin）
+// ------------------------
+@use "../utility/variable" as *;
+@use "../utility/mixin" as *;
+@use "../utility/rclamp" as *;
+
+// ------------------------
+// グーグルフォントページ読み込み時チラつき回避
+// ------------------------
+body.hidden {
+  visibility: hidden;
+}
+.loadingSpinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  font-size: 2em;
+  transform: translate(-50%, -50%);
+}

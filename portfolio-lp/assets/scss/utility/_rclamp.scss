@@ -1,0 +1,36 @@
+// ------------------------
+// rclamp() - min〜maxをrem単位で可変する関数
+//   $min         : 最小値(px)
+//   $max         : 最大値(px)
+//   $minViewport : 最小適用ビューポート幅(px)
+//   $maxViewport : 最大適用ビューポート幅(px)
+// ------------------------
+@function rclamp($min, $max, $minViewport, $maxViewport) {
+  $vwScale: ($max - $min) / ($maxViewport - $minViewport); // 1pxの増加量をvw換算
+  $baseOffset: $min - $minViewport * $vwScale; // vw掛け算前の基準値
+  $minRem: $min / 16; // px → rem
+  $maxRem: $max / 16;
+  $baseOffsetRem: $baseOffset / 16;
+  $vwScaleRem: $vwScale * 100; // 1vw = 1%
+  @return clamp(#{$minRem}rem, #{$baseOffsetRem}rem + #{$vwScaleRem}vw, #{$maxRem}rem);
+}
+
+// ------------------------
+// pxClamp() - min〜maxをpx単位で可変する関数
+//   $min         : 最小値(px)
+//   $max         : 最大値(px)
+//   $minViewport : 最小適用ビューポート幅(px)
+//   $maxViewport : 最大適用ビューポート幅(px)
+// ------------------------
+@function pxClamp($min, $max, $minViewport, $maxViewport) {
+  $vwScale: ($max - $min) / ($maxViewport - $minViewport); // 1pxの増加量をvw換算
+  $baseOffset: $min - $minViewport * $vwScale; // vw掛け算前の基準値
+  $vwScaleVW: $vwScale * 100; // 1vw = 1%
+  @return clamp(#{$min}px, #{$baseOffset}px + #{$vwScaleVW}vw, #{$max}px);
+}
+
+/* Safari 10.1〜12.0 のclamp()バグ対策 */
+* {
+  min-height: 0vw; // clamp計算で発生する高さバグを回避
+  min-height: 0; // 上書き用（他ブラウザ影響なし）
+}

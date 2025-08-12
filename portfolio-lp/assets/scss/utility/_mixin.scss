@@ -1,0 +1,33 @@
+// ------------------------
+// Utility（変数・関数）
+// ------------------------
+@use "../utility/variable" as *;
+@use "../utility/rclamp" as *;
+
+// ------------------------
+// フォント
+// ------------------------
+$noto-sans: "Noto Sans JP", sans-serif;
+
+// ------------------------
+// メディアクエリ
+// ------------------------
+@mixin sp {
+  @media (max-width: $breakpoint-sp-max) {
+    @content;
+  }
+}
+@mixin tab {
+  @media (min-width: $breakpoint-tab) {
+    @content;
+  }
+}
+@mixin pc {
+  @media (min-width: $breakpoint-pc) {
+    @content;
+  }
+}
+
+// ------------------------
+// mixin
+// ------------------------

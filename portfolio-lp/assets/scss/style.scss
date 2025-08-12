@@ -1,0 +1,27 @@
+@charset "utf-8";
+
+// ------------------------
+// Base（初期化や全体ベーススタイル）
+// ------------------------
+@use "base/destyle";
+@use "base/common";
+
+// ------------------------
+// Layout（サイトの大枠構造）
+// ------------------------
+@use "layout/header";
+@use "layout/footer";
+@use "layout/main-visual";
+
+// ------------------------
+// Component（再利用パーツ）
+// ------------------------
+@use "component/button";
+@use "component/form";
+@use "component/accordion";
+@use "component/loading-spinner";
+
+// ------------------------
+// Page（ページ専用スタイル）
+// ------------------------
+@use "page/top";

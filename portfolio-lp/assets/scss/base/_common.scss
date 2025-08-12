@@ -1,0 +1,34 @@
+// ------------------------
+// Utility（変数・関数・mixin）
+// ------------------------
+@use "../utility/variable" as *;
+@use "../utility/mixin" as *;
+@use "../utility/rclamp" as *;
+
+// ------------------------
+// html
+// ------------------------
+html {
+  font-family: $noto-sans;
+  font-size: rclamp(6, 10, 375, 1280);
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  &.is-scroll-locked {
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+}
+.container {
+  width: 100%;
+  max-width: 1920px;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
+.inner {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
